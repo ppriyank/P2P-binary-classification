@@ -60,7 +60,7 @@ class Server(object):
                 soc.sendall(result.encode())
             except:
                 print(host , " \t " , port, "client doesnt exit")
-                del self.peers[lines]
+                del self.peers[req]
                 return 
             time.sleep(1)
     
