@@ -10,17 +10,44 @@ import torch
 
 class Server(object):
     def __init__(self, HOST='', PORT=7734, V='P2P-CI/1.0'):
+        self.SERVER_HOST = 'localhost'
+        self.SERVER_PORT = 7734
+        
+
         self.HOST = HOST
         self.PORT = PORT
         self.V = V
         # element: {(host,port), set[rfc #]}
-        self.peers = defaultdict(set)
+        self.peers = {}
+        # self.peers = defaultdict(set)
         # element: {RFC #, (title, set[(host, port)])}
         self.rfcs = {}
         self.lock = threading.Lock()
         self.version = 0
     # start listenning
     def start(self):
+        print('Connecting to the server %s:%s' % (self.SERVER_HOST, self.SERVER_PORT))
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.server.connect((self.SERVER_HOST, self.SERVER_PORT))
+        except Exception:
+            print('Server Not Available.')
+            return
+
+        print('Connected')
+        # upload
+        uploader_process = threading.Thread(target=self.init_upload)
+        uploader_process.start()
+        while self.UPLOAD_PORT is None:
+            # wait until upload port is initialized
+            pass
+        print('Listening on the upload port %s' % self.UPLOAD_PORT)
+
+        # interactive shell
+        self.cli()
+
+
+
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s.bind((self.HOST, self.PORT))
@@ -46,39 +73,49 @@ class Server(object):
         # keep recieve request from client
         host = None
         port = None
-        while True:
-            try:
-                req = soc.recv(1024).decode()
-                print('Recieve request:\n%s' % req)
-                lines = req.splitlines()
-                version = lines[0].split()[-1]
+        req = soc.recv(1024).decode()
+        print('Recieve request:\n%s' % req)
+        lines = req.splitlines()
+        host = lines[1].split(None, 1)[1]
+                        port = int(lines[2].split(None, 1)[1])
+                        self.peers[(host,port)] = 1
+        version = lines[0].split()[-1]
                 if version != self.V:
                     soc.sendall(str.encode(
                         self.V + ' 505 P2P-CI Version Not Supported\n'))
+
+
+        while True:
+
+            try:
+                
+                
+                
+                
                 else: 
                     method = lines[0].split()[0]
                     if method == 'UPLOAD':
-                        host = lines[1].split(None, 1)[1]
-                        port = int(lines[2].split(None, 1)[1])
-                        label = int(lines[3].split()[-1])
-                        req = soc.recv(1024)
-                        while True:
-                            temp = soc.recv(1024)
-                            req += temp
-                            print(len(req))
-                            if len(temp) >= 1024:
-                                continue 
-                            else:
-                                break
-                        data_loaded = pickle.loads(req)
-                        self.train(data_loaded, label)
-                    elif method == 'LOOKUP':
-                        num = int(lines[0].split()[-2])
-                        self.getPeersOfRfc(soc, num)
-                    elif method == 'LIST':
-                        self.getAllRecords(soc)
-                    else:
-                        raise AttributeError('Method Not Match')
+                        
+                        
+                    #     label = int(lines[3].split()[-1])
+                    #     req = soc.recv(1024)
+                    #     while True:
+                    #         temp = soc.recv(1024)
+                    #         req += temp
+                    #         print(len(req))
+                    #         if len(temp) >= 1024:
+                    #             continue 
+                    #         else:
+                    #             break
+                    #     data_loaded = pickle.loads(req)
+                    #     self.train(data_loaded, label)
+                    # elif method == 'LOOKUP':
+                    #     num = int(lines[0].split()[-2])
+                    #     self.getPeersOfRfc(soc, num)
+                    # elif method == 'LIST':
+                    #     self.getAllRecords(soc)
+                    # else:
+                    #     raise AttributeError('Method Not Match')
             except ConnectionError:
                 print('%s:%s left' % (addr[0], addr[1]))
                 # Clean data if necessary
@@ -159,5 +196,4 @@ class Server(object):
 
 if __name__ == '__main__':
     s = Server()
-
     s.start()
