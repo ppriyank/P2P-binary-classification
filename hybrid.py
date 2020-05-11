@@ -10,8 +10,7 @@ import json
 from PIL import Image
 import pickle
 
-
-import torch
+from trainer import Trainer
 
 class Server(object):
     def __init__(self, HOST='localhost', PORT=7734):
@@ -25,14 +24,9 @@ class Server(object):
         self.shareable = True
         self.version = 0
         self.lock = threading.Lock()
-        self.h = 100
-        self.w = 100
-        
-        # element: {(host,port), set[rfc #]}
         self.peers = {}
-        # element: {RFC #, (title, set[(host, port)])}
-        self.rfcs = {}        
-        
+        self.trainer = Trainer()
+        self.version = 0
 
     def start(self):
         # connect to server
@@ -56,8 +50,7 @@ class Server(object):
         self.cli()
 
 
-    def cli(self):
-        self.version = 0
+    def cli(self):        
         self.command_dict = {'1': self.upload_image,
                         '2': self.classify,
                         '3': self.look_up,
@@ -101,10 +94,11 @@ class Server(object):
         file = Path('%s/%s' % (self.DIR, title))
         print(file)
         image = Image.open(file)
-        image = image.resize(( self.h , self.w) ) 
-
+        # image = image.resize(( self.h , self.w) )
+        # import pdb
+        # pdb.set_trace()
         
-        
+        self.trainer.train(image , label)
         
         
 
@@ -140,6 +134,7 @@ class Server(object):
     	return
 
     def look_up(self , disply=True):
+        print(self.UPLOAD_PORT ,  self.version)
         result = self.server.recv(1024).decode()
         result = result.split("****")[-2]
         self.peers = json.loads(result)
@@ -155,11 +150,10 @@ class Server(object):
             if version == '' :
                 continue 
             if disply:
-                print(self.UPLOAD_PORT ,port,  version)
+                print(port,  version)
             if version > self.version:
                 self.version = version
-
-    	return
+        return
 
     def download(self):
     	return

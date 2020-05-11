@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-import torchvision
+
 
 
 
@@ -32,8 +32,5 @@ class MODEL(nn.Module):
 
 
         x = self.gap(x).squeeze(-1).squeeze(-1)
-        import pdb 
-        pdb.set_trace()
-
         x = self.classifier(x)
         return x
