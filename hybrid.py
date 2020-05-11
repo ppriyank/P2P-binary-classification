@@ -99,6 +99,8 @@ class Server(object):
         # pdb.set_trace()
         
         self.trainer.train(image , label)
+        import pdb
+        pdb.set_trace()
         
         
 
