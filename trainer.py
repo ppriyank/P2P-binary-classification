@@ -25,7 +25,7 @@ class Trainer:
 		return loss
 
 	def train(self, x, label):
-		
+
 		x = self.preprocess(x).unsqueeze(0)
 		x, label = Variable(x), Variable(torch.tensor(label))
 		
@@ -37,3 +37,28 @@ class Trainer:
 		self.optimizer.step()
 
 		return loss.item()
+
+
+	def loss(self, output, label, epsilon=1e-6 , ):
+		log_probs = self.logsoftmax(output)
+		targets = torch.zeros(log_probs.size()).scatter_(1, label.unsqueeze(0).unsqueeze(1).data, 1)
+		targets = (1 - epsilon) * targets + epsilon / 2
+		loss = (- targets * log_probs).mean(0).sum()
+		return loss
+
+
+	def package(self):
+		state_dict = model.module.state_dict()
+		save_checkpoint({
+                       
+                            'state_dict': state_dict,
+                       }, is_best, osp.join(args.save_dir, args.arch+ "_" + args.name + "_"  +args.opt+ '_checkpoint_ep' + str(epoch+1) + '.pth.tar')) 
+
+		def save_checkpoint(state, is_best, fpath='checkpoint.pth.tar'):
+    mkdir_if_missing(osp.dirname(fpath))
+    matching_file = fpath.split("ep")[0].split("/")[-1]
+    dir_ =  osp.dirname(fpath)
+    for f in os.listdir(dir_):
+        if re.search(matching_file, f):
+            os.remove(os.path.join(dir_, f))            
+    torch.save(state, fpath)
