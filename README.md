@@ -4,14 +4,20 @@ Reference: https://github.com/zhulinn/P2P-File-System-Python/
 
 #Azure
 # IOT example :
+https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
+https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-python-python-device-management-get-started
+
 
 ### Hub creation 
 https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
 
-
-https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
-
-
+### Create Device and delete Device
+```
+az extension add --name azure-iot
+az iot hub device-identity  create --device-id chikka --hub-name pathak
+az iot hub device-identity show-connection-string --device-id chikka --hub-name pathak -o table
+az iot hub device-identity delete --device-id pathak --hub-name pathak
+```
 
 # Google
 # IOT example :
@@ -63,7 +69,8 @@ gcloud pubsub subscriptions create \
 https://cloud.google.com/iot/docs/support/troubleshooting
 
 
-<!-- client throws unresolved error while and sending message  disconnected: 1: Out of memory. -->
+### Error 
+client throws unresolved error while and sending message  disconnected: 1: Out of memory.
 
 
 
