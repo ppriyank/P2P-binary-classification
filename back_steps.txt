@@ -3,23 +3,65 @@
 gcloud iam service-accounts keys create chikka.json --iam-account ppriyank@e2e-example-277116.iam.gserviceaccount.com
 
 export GOOGLE_APPLICATION_CREDENTIALS="/Users/ppriyank/cloud_iot/python-docs-samples/iot/api-client/end_to_end_example/chikka.json"
+export GOOGLE_APPLICATION_CREDENTIALS="/Users/ppriyank/cloud_iot/python-docs-samples/iot/api-client/end_to_end_example/chikka.json"
 
 e2e-example
 Email address	  e2e-example@e2e-example-277116.iam.gserviceaccount.com
-
+Key IDs	 ccb8a027ddd785d797c6eeb0f0593f14cf365114
 
 
 python cloudiot_pubsub_example_mqtt_device.py \
     --project_id=e2e-example-277116 \
     --registry_id=my-registry \
-    --device_id=0 \
+    --device_id=my-device \
     --private_key_file=rsa_private.pem \
     --algorithm=RS256 \
-    --cloud_region=asia-east1
+    --cloud_region=us-central1
 
 
 python cloudiot_pubsub_example_server.py \
     --project_id=e2e-example-277116 \
     --pubsub_subscription=projects/e2e-example-277116/subscriptions/my-subscription \
     --service_account_json=service_account.json
+
+
+
+gcloud iot registries describe my-registry \
+      --project=e2e-example-277116 \
+      --region=us-central1
+
+
+gcloud iot devices describe my-device \
+      --project=e2e-example-277116 \
+      --region=us-central1 \
+      --registry=my-registry
+
+
+
+python cloudiot_mqtt_example.py \
+--device_id my-device \
+--registry_id=my-registry \
+--private_key_file=rsa_private.pem \
+--algorithm=RS256 \
+--
+
+
+python chikka2.py \
+--device_id my-device \
+--registry_id=my-registry \
+--private_key_file=rsa_private.pem \
+--algorithm=RS256 
+
+
+python2 cloudiot_mqtt_example.py --device_id my-device --registry_id=my-registry --private_key_file=rsa_private.pem --algorithm=RS256 
+
+
+
+python2 cloudiot_pubsub_example_mqtt_device.py \
+    --project_id=e2e-example-277116 \
+    --registry_id=my-registry \
+    --device_id=my-device \
+    --private_key_file=rsa_private.pem \
+    --algorithm=RS256 \
+    --cloud_region=us-central1
 
