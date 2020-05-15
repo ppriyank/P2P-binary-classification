@@ -26,6 +26,7 @@ class Trainer:
 		return loss
 
 	def train(self, x, label):
+		self.model.train()
 
 		x = self.preprocess(x).unsqueeze(0)
 		x, label = Variable(x), Variable(torch.tensor(label))
@@ -39,13 +40,20 @@ class Trainer:
 
 		return loss.item()
 
-	def loss(self, output, label, epsilon=1e-6 , ):
+	def loss(self, output, label, epsilon=1e-6 ):
 		log_probs = self.logsoftmax(output)
 		targets = torch.zeros(log_probs.size()).scatter_(1, label.unsqueeze(0).unsqueeze(1).data, 1)
 		targets = (1 - epsilon) * targets + epsilon / 2
 		loss = (- targets * log_probs).mean(0).sum()
 		return loss
 
+	def evaluate(self, x ):
+		self.model.eval()
+		x = self.preprocess(x).unsqueeze(0)
+		x= Variable(x)
+		output =  self.model(x)
+
+		return output.argmax().item()
 	# def package(self):
 	# 	state_dict = model.module.state_dict()
 	# 	save_checkpoint({
