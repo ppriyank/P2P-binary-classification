@@ -6,7 +6,7 @@ Reference: https://github.com/zhulinn/P2P-File-System-Python/
 # IOT example :
 https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
 https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-python-python-device-management-get-started
-
+https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-python-python-c2d
 
 ### Hub creation 
 https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
@@ -18,6 +18,9 @@ az iot hub device-identity  create --device-id chikka --hub-name pathak
 az iot hub device-identity show-connection-string --device-id chikka --hub-name pathak -o table
 az iot hub device-identity delete --device-id pathak --hub-name pathak
 ```
+
+## Note:
+Python Azure iot Hub, doesnt have ackowldgement 
 
 # Google
 # IOT example :

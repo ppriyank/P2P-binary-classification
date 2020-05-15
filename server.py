@@ -54,8 +54,6 @@ class Server(object):
         while True:
             result = json.dumps(self.peers) 
             result += "****"
-            # import pdb
-            # pdb.set_trace()
             try:
                 soc.sendall(result.encode())
             except:
