@@ -16,6 +16,15 @@ from azure.iot.device import IoTHubDeviceClient
 
 import random
 
+import boto3
+import os 
+
+location = "us-east-1"
+
+os.environ['AWS_PROFILE'] = "Profile1"
+os.environ['AWS_DEFAULT_REGION'] = location
+
+bucket_name = "ppriyankbucketdemo"
 
 file = open("/Users/ppriyank/coding/p2p project/cred.txt","r") 
 CONNECTION_server = file.read()
@@ -25,6 +34,7 @@ BUFFER_SIZE = 4096
 
 class Server(object):
     def __init__(self, HOST='localhost', PORT=7734):
+
         self.SERVER_HOST = 'localhost'
         self.SERVER_PORT = 7734
         
@@ -40,6 +50,12 @@ class Server(object):
         self.lock = threading.Lock()
         self.h = 100
         self.w = 100
+        self.s3 = boto3.client('s3')
+        # self.s3 = boto3.client('s3', region_name=location)
+
+        print("Conntected to AWS")
+        # response = s3.list_buckets()
+        print ()
     
     def start(self):
         try:
@@ -108,7 +124,7 @@ class Server(object):
                         '7': self.shutdown}                        
         while True:
             try:
-                req = input('\n1: Check Model Version\n2: Check Peers\n3: Look up images\n4: Train Image \n5: Classify Image \n6: Download \n7: Shut Down\nEnter your request: ')
+                req = input('\n1: Check Model Version\n2: Check Peers\n3: Look up storage \n4: Train Image \n5: Classify Image \n6: Download \n7: Shut Down\nEnter your request: ')
                 self.command_dict.setdefault(req, self.invalid_input)()
             except MyException as e:
                 print(e)
@@ -133,20 +149,42 @@ class Server(object):
             else:
                 DEVICE_ID = peer['deviceId']
                 data = self.id + " " +  str(self.UPLOAD_PORT) + " " + socket.gethostname() + " " + str(self.version) 
-                self.registry_manager.send_c2d_message(DEVICE_ID, data)        
-                requester, addr = self.uploader.accept()
-                message= requester.recv(1024).decode()
-                message = message.split()
-                if int(message[3]) > so_far:
-                    so_far = int(message[3])
-                    device_id = DEVICE_ID
-                if display:
-                    print("Device id (IOT) %s Device id recieved: %s\tPORT: %s\tHOST: %s\tVersion: %s"%(DEVICE_ID, message[0], message[1] , message[2], message[3]))
+                try:
+                    self.registry_manager.send_c2d_message(DEVICE_ID, data)        
+                    requester, addr = self.uploader.accept()
+                    message= requester.recv(1024).decode()
+                    message = message.split()
+                    if int(message[3]) > so_far:
+                        so_far = int(message[3])
+                        device_id = DEVICE_ID
+                    if display:
+                        print("Device id (IOT) %s Device id recieved: %s\tPORT: %s\tHOST: %s\tVersion: %s"%(DEVICE_ID, message[0], message[1] , message[2], message[3]))
+                except Exception as e:
+                    print("peer information not available, most likely due to token expiry")
+                    return self.version , self.id
+
         return so_far , device_id
     
     def look_up(self):
+        print ("Local Storage")
         print ( os.listdir("rfc") ) 
+        files = []
+        print ("Looking Cloud Storage")
+        s3_result =  self.s3.list_objects_v2(Bucket=bucket_name, Delimiter = "/")
+        if 'Contents' not in s3_result and 'CommonPrefixes' not in s3_result:
+            print ("empty bucket")
+        else:
+            files = []
+            if s3_result.get('Contents'):
+                    for key in s3_result['Contents']:
+                        print ("Downloading " ,key['Key'])
+                        metadata = self.s3.head_object(Bucket=bucket_name, Key=key['Key'])
+                        files.append((key['Key'],metadata["Metadata"]["label"]) )
+                        with open(self.DIR + "/"  + key['Key'], 'wb') as f:
+                            self.s3.download_fileobj(bucket_name, key['Key'], f)
 
+        print ("UPDATED Local Storage")
+        print ( os.listdir("rfc") ) 
 
     def train(self):
         self.download()
@@ -155,7 +193,8 @@ class Server(object):
         title = input('Enter image name: ')
         label = input('Enter label: ')
         
-        
+        filename = self.DIR + "/" + title        
+        self.s3.upload_file( filename, bucket_name, title, ExtraArgs={'Metadata': {'label': str(label)}})
         file = Path('%s/%s' % (self.DIR, title))
         
         image = Image.open(file)
