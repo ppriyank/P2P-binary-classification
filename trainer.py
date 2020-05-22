@@ -3,6 +3,7 @@ import torch
 from torch.autograd import Variable
 from torch import nn
 import torchvision.transforms as transforms
+import json 
 
 class Trainer:
 	def __init__(self):
@@ -54,18 +55,15 @@ class Trainer:
 		output =  self.model(x)
 
 		return output.argmax().item()
-	# def package(self):
-	# 	state_dict = model.module.state_dict()
-	# 	save_checkpoint({
-                       
- #                            'state_dict': state_dict,
- #                       }, is_best, osp.join(args.save_dir, args.arch+ "_" + args.name + "_"  +args.opt+ '_checkpoint_ep' + str(epoch+1) + '.pth.tar')) 
 
-	# 	def save_checkpoint(state, is_best, fpath='checkpoint.pth.tar'):
- #    mkdir_if_missing(osp.dirname(fpath))
- #    matching_file = fpath.split("ep")[0].split("/")[-1]
- #    dir_ =  osp.dirname(fpath)
- #    for f in os.listdir(dir_):
- #        if re.search(matching_file, f):
- #            os.remove(os.path.join(dir_, f))            
- #    torch.save(state, fpath)
+	def package(self, path ):
+		state_dict = self.model.state_dict()
+		# result =  json.dumps(state_dict) 
+		torch.save(state_dict, path)
+
+	def load_package(self, path ):
+		checkpoint = torch.load(path)
+		self.model.load_state_dict(checkpoint,  strict=True)
+		
+		
+		

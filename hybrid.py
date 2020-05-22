@@ -16,7 +16,10 @@ from azure.iot.device import IoTHubDeviceClient
 
 import random
 
-CONNECTION_server = "HostName=pathak.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=Kh2rXgJDhBmnVxR8mmUuw7VNULj9ebTWB4se1RHcm40="
+
+file = open("/Users/ppriyank/coding/p2p project/cred.txt","r") 
+CONNECTION_server = file.read()
+file.close()
 BUFFER_SIZE = 4096
 
 
@@ -60,8 +63,6 @@ class Server(object):
         message_listener_thread = threading.Thread(target=self.message_listener, args=(client,))
         message_listener_thread.daemon = True
         message_listener_thread.start()
-        
-        
         self.cli()
 
 
@@ -149,18 +150,19 @@ class Server(object):
 
     def train(self):
         self.download()
-        title = "1.png"
-        label = 1
-        # title = input('Enter image name: ')
-        # label = input('Enter label: ')
+        # title = "1.png"
+        # label = 1
+        title = input('Enter image name: ')
+        label = input('Enter label: ')
+        
         
         file = Path('%s/%s' % (self.DIR, title))
         
         image = Image.open(file)
         image = image.resize(( self.h , self.w) )
-        
+        label = int(label)
         loss = self.trainer.train(image , label)
-        print ("Training Loss %f" , loss)
+        print ("Training Loss %f" %(loss) ) 
         self.version +=1
 
         # image.show()
@@ -179,8 +181,8 @@ class Server(object):
     def classify(self):
         # cmp --silent ./rfc/checkpoint.pth.tar ../rfc/checkpoint.pth.tar || echo "files are different"
         self.download()
-        title = "1.png"
-        # title = input('Enter image name: ')
+        # title = "1.png"
+        title = input('Enter image name: ')
         # label = input('Enter label: ')
         file = Path('%s/%s' % (self.DIR, title))
         
