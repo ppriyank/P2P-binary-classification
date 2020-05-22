@@ -2,6 +2,16 @@
 
 Reference: https://github.com/zhulinn/P2P-File-System-Python/
 
+# Runnnig :
+## Terminal
+`python hybrid.py`  
+`az iot hub device-identity list --hub-name pathak -o table`    
+`az iot hub device-identity delete --device-id 3129 --hub-name pathak`  
+
+## Bucket verification
+`https://labs.vocareum.com/main/main.php?m=editor&nav=1&asnid=14334&stepid=14335`
+
+
 #Azure
 # IOT example :
 https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python
