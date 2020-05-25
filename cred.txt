@@ -1,0 +1,1 @@
+HostName=pathak.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=1piztpISG6+SaxWmmgye/Tf4PkgyTL4e3O83DPQWhJY=
