@@ -2,14 +2,27 @@
 
 Reference: https://github.com/zhulinn/P2P-File-System-Python/
 
-# Runnnig :
-## Terminal
-`python hybrid.py`  
-`az iot hub device-identity list --hub-name pathak -o table`    
-`az iot hub device-identity delete --device-id 3129 --hub-name pathak`  
 
-## Bucket verification
+# Runnnig :
+
+Create IoT hub using : https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-python  
+"Get the IoT hub connection string" using : https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-python-python-c2d
+
+Once done : store the credential in `cred.txt`
+Change the path of this cred.txt on line 29, in hybrid.py e.g. "../cred.txt" in client 1 folder. 
+
+Make copies of client folder to simulate different clients and computers and just create AWS S3 bucket with name : `ppriyankbucketdemo` or change any name and replace it on line 27. 
+
+Then do 
+
+`python hybrid.py`    
+`az iot hub device-identity list --hub-name pathak -o table`      
+
+## Checks 
+
+`az iot hub device-identity delete --device-id 3129 --hub-name pathak`  
 `https://labs.vocareum.com/main/main.php?m=editor&nav=1&asnid=14334&stepid=14335`
+
 
 
 #Azure

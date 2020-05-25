@@ -26,7 +26,7 @@ os.environ['AWS_DEFAULT_REGION'] = location
 
 bucket_name = "ppriyankbucketdemo"
 
-file = open("/Users/ppriyank/coding/p2p project/cred.txt","r") 
+file = open("../cred.txt","r") 
 CONNECTION_server = file.read()
 file.close()
 BUFFER_SIZE = 4096
